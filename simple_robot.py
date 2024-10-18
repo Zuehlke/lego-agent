@@ -1,90 +1,75 @@
+import time
+
 from ev3dev2.led import Leds
+from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_B, SpeedPercent
+from ev3dev2.sound import Sound
+from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
+from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
 
-# Reusable type definitions
-LEDGroup = str # ['LEFT', 'RIGHT']
-LEDColor = str # ['BLACK', 'RED', 'GREEN', 'AMBER', 'ORANGE', 'YELLOW']
 
+COLOR_MAP = {
+    0: "NO COLOR",
+    1: "BLACK",
+    2: "BLUE",
+    3: "GREEN",
+    4: "YELLOW",
+    5: "RED",
+    6: "WHITE",
+    7: "BROWN"
+}
 
 
 class SimpleRobot(object):
-    def __init__(self, **data):
+    def __init__(self):
         self.leds = Leds()
+        self.tank_drive = MoveTank(OUTPUT_A, OUTPUT_B)
+        self.sound = Sound()
+        self.touch_sensor = TouchSensor(INPUT_1)
+        self.color_sensor = ColorSensor(INPUT_3)
+        self.ultrasonic_sensor = UltrasonicSensor(INPUT_4)
 
-
-    def set_led_color(self,
-                      group: LEDGroup,
-                      color: LEDColor,
-                      pct = 1
-                    ) -> None:
+    def set_leds(self, left_color: str, right_color: str) -> None:
         """
-            "description": "Set the color of a specific LED",
+            "description": "Set the color of a specific LED (or turn it off by setting it to BLACK)",
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "group": {
+                "properties": {        # TODO
+                    "position": {
                         "type": "string",
                         "description": "Which LED to change the color.",
                         "enum": ["LEFT", "RIGHT"]
                     },
                     "color": {
                         "type": "string",
+                        "description": "Color to change the LED to.",
                         "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
-                    },
+                    }
                 },
                 "required": ["group", "color"]
             }
         """
-        self.leds.set_color(group, color, pct)
+        self.leds.set_color("LEFT", left_color)
+        self.leds.set_color("RIGHT", right_color)
 
+    def set_motors(self, left_speed: int, right_speed: int) -> None:
+        self.tank_drive.on(SpeedPercent(left_speed), SpeedPercent(right_speed))
 
-    def all_leds_off(self) -> None:
-        """
-            "description": "Turn all LEDs off"
-        """
-        self.leds.all_off()
+    def speak(self, text: str) -> None:
+        self.sound.speak(text)
 
-    
-    def animate_police_lights(self,
-                              color1: LEDColor='RED',
-                              color2: LEDColor='YELLOW',
-                              group1: LEDGroup='LEFT',
-                              group2: LEDGroup='RIGHT',
-                              sleeptime=0.5,
-                              duration=5,
-                              block=True
-                            ) -> None:
-        """
-            "description": "Cycle the group1 and group2 LEDs between color1 and color2 to give the effect of police lights.  Alternate the group1 and group2 LEDs every sleeptime seconds. Animate for duration seconds.  If duration is None animate for forever.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "color1": {
-                        "type": "string",
-                        "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
-                    },
-                    "color2": {
-                        "type": "string",
-                        "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
-                    },
-                    "group1": {
-                        "type": "string",
-                        "description": "Which LED to change the color.",
-                        "enum": ["LEFT", "RIGHT", "BOTH"]
-                    },
-                    "group2": {
-                        "type": "string",
-                        "description": "Which LED to change the color.",
-                        "enum": ["LEFT", "RIGHT", "BOTH"]
-                    },
-                },
-                "required": []
-            }
-        """
-        self.leds.animate_police_lights(color1, color2, group1, group2, sleeptime, duration, block)
+    def get_button(self) -> bool:
+        return self.touch_sensor.is_pressed
 
-    
-    def animate_stop(self) -> None:
-        """
-            "description": "Stop all animation"
-        """
-        self.leds.animate_stop()
+    def wait_button_pressed(self) -> None:
+        while not self.get_button():
+            time.sleep(0.1)
+
+    def wait_button_released(self) -> None:
+        while self.get_button():
+            time.sleep(0.1)
+
+    def get_color(self) -> str:
+        return COLOR_MAP[self.color_sensor.color]
+
+    def get_distance(self) -> int:
+        return int(self.ultrasonic_sensor.distance_centimeters)
