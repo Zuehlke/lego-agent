@@ -3,7 +3,9 @@
 from xmlrpc.server import SimpleXMLRPCServer
 
 from simple_robot import SimpleRobot
+
 robot = SimpleRobot()
+
 
 def rpc_server():
     # Create server

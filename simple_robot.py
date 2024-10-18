@@ -29,47 +29,94 @@ class SimpleRobot(object):
         self.ultrasonic_sensor = UltrasonicSensor(INPUT_4)
 
     def set_leds(self, left_color: str, right_color: str) -> None:
-        """
-            "description": "Set the color of a specific LED (or turn it off by setting it to BLACK)",
+        """{
+            "description": "Set the color of the left and right LED (or turn it off by setting it to BLACK).",
             "parameters": {
                 "type": "object",
-                "properties": {        # TODO
-                    "position": {
+                "properties": {
+                    "left_color": {
                         "type": "string",
-                        "description": "Which LED to change the color.",
-                        "enum": ["LEFT", "RIGHT"]
+                        "description": "Color of left LED.",
+                        "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
                     },
-                    "color": {
+                    "right_color": {
                         "type": "string",
-                        "description": "Color to change the LED to.",
+                        "description": "Color of right LED.",
                         "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
                     }
-                },
-                "required": ["group", "color"]
+                }
             }
-        """
+        }"""
         self.leds.set_color("LEFT", left_color)
         self.leds.set_color("RIGHT", right_color)
 
     def set_motors(self, left_speed: int, right_speed: int) -> None:
+        """{
+            "description": "Set the speed of the left and right motor (or turn it off by setting it to 0).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "left_speed": {
+                        "type": "integer",
+                        "description": "Speed of left motor, from -100 (full backwards) to 100 (full forwards)."
+                    },
+                    "right_speed": {
+                        "type": "integer",
+                        "description": "Speed of right motor, from -100 (full backwards) to 100 (full forwards)."
+                    }
+                }
+            }
+        }"""
         self.tank_drive.on(SpeedPercent(left_speed), SpeedPercent(right_speed))
 
     def speak(self, text: str) -> None:
+        """{
+            "description": "Speak a text via the speaker of the robot.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "Text to speak."
+                    }
+                }
+            }
+        }"""
         self.sound.speak(text)
 
     def get_button(self) -> bool:
+        """{
+            "description": "Get the value of the touch sensor, whether it's pressed or not.",
+            "parameters": {}
+        }"""
         return self.touch_sensor.is_pressed
 
     def wait_button_pressed(self) -> None:
+        """{
+            "description": "Function which blocks until the touch sensor is pressed.",
+            "parameters": {}
+        }"""
         while not self.get_button():
             time.sleep(0.1)
 
     def wait_button_released(self) -> None:
+        """{
+            "description": "Function which blocks until the touch sensor is released.",
+            "parameters": {}
+        }"""
         while self.get_button():
             time.sleep(0.1)
 
     def get_color(self) -> str:
+        """{
+            "description": "Get the color which is detected by the color sensor.",
+            "parameters": {}
+        }"""
         return COLOR_MAP[self.color_sensor.color]
 
     def get_distance(self) -> int:
+        """{
+            "description": "Get the distance which is detected by the distance sensor, value in centimeters.",
+            "parameters": {}
+        }"""
         return int(self.ultrasonic_sensor.distance_centimeters)

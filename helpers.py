@@ -7,6 +7,9 @@ def list_functions_with_docs(obj):
 
 
 def string_to_dict(s):
+    # Replacement: print(json.loads('{"type": "function", "function": {"name": "set_led_color",' + SimpleRobot.set_led_color.__doc__ + '}}'))
+    # also set required field to all values
+
     s = s.strip()
     s = '{' + s + '}'
     
