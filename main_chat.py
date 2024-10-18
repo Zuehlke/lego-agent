@@ -1,3 +1,4 @@
+import argparse
 import inspect
 import json
 import openai
@@ -5,12 +6,11 @@ import xmlrpc.client
 
 from simple_robot import SimpleRobot
 
-ROBOT_IP = '192.168.1.168'
-
 
 def get_tool_args(fn_name):
     fn = getattr(SimpleRobot, fn_name)
     return [a for a in inspect.signature(fn).parameters if a != 'self']
+
 
 def get_tool_desc():
     robot_functions = [f for f in dir(SimpleRobot) if not f.startswith('_')]
@@ -31,7 +31,7 @@ def get_tool_desc():
     return tools
 
 
-def main():
+def main(ip_address: str):
     tool_desc = get_tool_desc()
 
     history = [{
@@ -39,7 +39,7 @@ def main():
         "content": "You control a lego robot by calling different functions that execute commands on the robot"
     }]
 
-    rpc_client = xmlrpc.client.ServerProxy(f'http://{ROBOT_IP}:8000', allow_none=True)
+    rpc_client = xmlrpc.client.ServerProxy(f'http://{ip_address}:8000', allow_none=True)
 
     while True:
         user_msg = input('>>> ')
@@ -66,7 +66,9 @@ def main():
                     fn_name = tool_call.function.name
                     fn_args = json.loads(tool_call.function.arguments)
                     fn_args_positional = [fn_args[a] for a in get_tool_args(fn_name)]
+                    print(f'    {fn_name}({fn_args_positional if len(fn_args_positional) > 0 else ""})', end='')
                     response = getattr(rpc_client, fn_name)(*fn_args_positional)
+                    print(f' -> {str(response)}')
                     history.append({
                         "role": "tool",
                         "content": str(response),
@@ -77,4 +79,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('ip_address', type=str)
+    args = parser.parse_args()
+
+    main(args.ip_address)
