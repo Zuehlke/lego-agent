@@ -1,4 +1,6 @@
 import sys
+import threading
+import time
 import xmlrpc.client
 
 
@@ -11,6 +13,10 @@ class RobotClient:
         except ConnectionRefusedError:
             print("Could not connect to robot! Is the server running? Is the IP address correct?")
             sys.exit()  # not nice, but results in user-friendly error message
+        self._motor_speeds = (0, 0)
+        motor_watchdog = threading.Thread(target=self._motor_watchdog)
+        motor_watchdog.daemon = True
+        motor_watchdog.start()
 
     def set_leds(self, left_color: str, right_color: str) -> None:
         """{
@@ -50,7 +56,8 @@ class RobotClient:
                 }
             }
         }"""
-        return self._server.set_motors(left_speed, right_speed)
+        self._motor_speeds = (left_speed, right_speed)
+        self._server.set_motors(left_speed, right_speed)
 
     def speak(self, text: str) -> None:
         """{
@@ -103,3 +110,10 @@ class RobotClient:
             "parameters": {}
         }"""
         return self._server.get_distance()
+
+    def _motor_watchdog(self):
+        while True:
+            if self._motor_speeds != (0, 0):
+                print('Setting motor speed')
+                self._server.set_motors(self._motor_speeds[0], self._motor_speeds[1])
+            time.sleep(2)

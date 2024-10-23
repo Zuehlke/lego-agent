@@ -1,3 +1,4 @@
+import threading
 import time
 
 
@@ -16,6 +17,11 @@ COLOR_MAP = {
 class RobotServer:
     def __init__(self):
         self.init()
+        self._watchdog_enabled = False
+        self._watchdog_cnt = 0
+        motor_watchdog = threading.Thread(target=self._motor_watchdog)
+        motor_watchdog.daemon = True
+        motor_watchdog.start()
 
     def init(self):
         from ev3dev2.led import Leds
@@ -38,6 +44,8 @@ class RobotServer:
     def set_motors(self, left_speed: int, right_speed: int) -> None:
         from ev3dev2.motor import SpeedPercent
 
+        self._watchdog_cnt = 0
+        self._watchdog_enabled = True
         self.tank_drive.on(SpeedPercent(left_speed), SpeedPercent(right_speed))
 
     def speak(self, text: str) -> None:
@@ -65,3 +73,12 @@ class RobotServer:
 
     def get_distance(self) -> int:
         return int(self.ultrasonic_sensor.distance_centimeters)
+
+    def _motor_watchdog(self) -> None:
+        while True:
+            time.sleep(1)
+            if self._watchdog_enabled:
+                self._watchdog_cnt += 1
+                if self._watchdog_cnt > 5:
+                    self.set_motors(0, 0)
+                    self._watchdog_enabled = False
