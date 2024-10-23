@@ -40,6 +40,7 @@ def main(ip_address: str):
     }]
 
     rpc_client = xmlrpc.client.ServerProxy(f'http://{ip_address}:8000', allow_none=True)
+    rpc_client.init()
 
     while True:
         user_msg = input('>>> ')
