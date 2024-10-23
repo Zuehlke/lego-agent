@@ -37,6 +37,9 @@ class RobotServer:
         self.color_sensor = ColorSensor(INPUT_3)
         self.ultrasonic_sensor = UltrasonicSensor(INPUT_4)
 
+        self._stop_motors()
+        self.set_leds('BLACK', 'BLACK')
+
     def set_leds(self, left_color: str, right_color: str) -> None:
         self.leds.set_color("LEFT", left_color)
         self.leds.set_color("RIGHT", right_color)
@@ -74,11 +77,14 @@ class RobotServer:
     def get_distance(self) -> int:
         return int(self.ultrasonic_sensor.distance_centimeters)
 
+    def _stop_motors(self) -> None:
+        self.set_motors(0, 0)
+
     def _motor_watchdog(self) -> None:
         while True:
             time.sleep(1)
             if self._watchdog_enabled:
                 self._watchdog_cnt += 1
                 if self._watchdog_cnt > 5:
-                    self.set_motors(0, 0)
+                    self._stop_motors()
                     self._watchdog_enabled = False
