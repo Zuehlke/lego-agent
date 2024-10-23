@@ -2,13 +2,13 @@
 
 # DIESEN TEIL HIER SOLLTEST DU NICHT ÄNDERN
 from time import sleep
-import xmlrpc.client
 
-s = xmlrpc.client.ServerProxy('http://192.168.1.168:8000', allow_none=True)
-s.init()
+from robot_client import RobotClient
+
+r = RobotClient('192.168.1.168')
 
 # FÜGE AB HIER DEINEN CODE EIN:
 
-s.set_motors(100, -100)
+r.set_motors(20, 20)
 sleep(1)
-s.set_motors(0, 0)
+r.set_motors(0, 0)

@@ -1,35 +1,16 @@
-import time
+import sys
+import xmlrpc.client
 
 
-COLOR_MAP = {
-    0: "NO COLOR",
-    1: "BLACK",
-    2: "BLUE",
-    3: "GREEN",
-    4: "YELLOW",
-    5: "RED",
-    6: "WHITE",
-    7: "BROWN"
-}
+class RobotClient:
 
-
-class SimpleRobot:
-    def __init__(self):
-        self.init()
-
-    def init(self):
-        from ev3dev2.led import Leds
-        from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_B
-        from ev3dev2.sound import Sound
-        from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
-        from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
-
-        self.leds = Leds()
-        self.tank_drive = MoveTank(OUTPUT_A, OUTPUT_B)
-        self.sound = Sound()
-        self.touch_sensor = TouchSensor(INPUT_1)
-        self.color_sensor = ColorSensor(INPUT_3)
-        self.ultrasonic_sensor = UltrasonicSensor(INPUT_4)
+    def __init__(self, ip_address: str):
+        self._server = xmlrpc.client.ServerProxy(f'http://{ip_address}:8000', allow_none=True)
+        try:
+            self._server.init()
+        except ConnectionRefusedError:
+            print("Could not connect to robot! Is the server running? Is the IP address correct?")
+            sys.exit()  # not nice, but results in user-friendly error message
 
     def set_leds(self, left_color: str, right_color: str) -> None:
         """{
@@ -50,8 +31,7 @@ class SimpleRobot:
                 }
             }
         }"""
-        self.leds.set_color("LEFT", left_color)
-        self.leds.set_color("RIGHT", right_color)
+        return self._server.set_leds(left_color, right_color)
 
     def set_motors(self, left_speed: int, right_speed: int) -> None:
         """{
@@ -70,9 +50,7 @@ class SimpleRobot:
                 }
             }
         }"""
-        from ev3dev2.motor import SpeedPercent
-
-        self.tank_drive.on(SpeedPercent(left_speed), SpeedPercent(right_speed))
+        return self._server.set_motors(left_speed, right_speed)
 
     def speak(self, text: str) -> None:
         """{
@@ -87,41 +65,41 @@ class SimpleRobot:
                 }
             }
         }"""
-        self.sound.speak(text)
+        return self._server.speak(text)
 
     def get_button(self) -> bool:
         """{
             "description": "Get the value of the touch sensor, whether it's pressed or not.",
             "parameters": {}
         }"""
-        return self.touch_sensor.is_pressed
+        return self._server.get_button()
 
     def wait_button_pressed(self) -> None:
         """{
             "description": "Function which blocks until the touch sensor is pressed.",
             "parameters": {}
         }"""
-        while not self.get_button():
-            time.sleep(0.1)
+        while not self._server.wait_button_pressed():
+            pass
 
     def wait_button_released(self) -> None:
         """{
             "description": "Function which blocks until the touch sensor is released.",
             "parameters": {}
         }"""
-        while self.get_button():
-            time.sleep(0.1)
+        while not self._server.wait_button_released():
+            pass
 
     def get_color(self) -> str:
         """{
             "description": "Get the color which is detected by the color sensor.",
             "parameters": {}
         }"""
-        return COLOR_MAP[self.color_sensor.color]
+        return self._server.get_color()
 
     def get_distance(self) -> int:
         """{
             "description": "Get the distance which is detected by the distance sensor, value in centimeters.",
             "parameters": {}
         }"""
-        return int(self.ultrasonic_sensor.distance_centimeters)
+        return self._server.get_distance()

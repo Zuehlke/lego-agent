@@ -2,11 +2,11 @@
 
 from xmlrpc.server import SimpleXMLRPCServer
 
-from simple_robot import SimpleRobot
+from robot_server import RobotServer
 
 
 def main():
-    robot = SimpleRobot()
+    robot = RobotServer()
 
     server = SimpleXMLRPCServer(('0.0.0.0', 8000), allow_none=True)
     server.register_introspection_functions()

@@ -2,21 +2,20 @@ import argparse
 import inspect
 import json
 import openai
-import xmlrpc.client
 
-from simple_robot import SimpleRobot
+from robot_client import RobotClient
 
 
 def get_tool_args(fn_name):
-    fn = getattr(SimpleRobot, fn_name)
+    fn = getattr(RobotClient, fn_name)
     return [a for a in inspect.signature(fn).parameters if a != 'self']
 
 
 def get_tool_desc():
-    robot_functions = [f for f in dir(SimpleRobot) if not f.startswith('_')]
+    robot_functions = [f for f in dir(RobotClient) if not f.startswith('_')]
     tools = []
     for fn_name in robot_functions:
-        doc = getattr(SimpleRobot, fn_name).__doc__
+        doc = getattr(RobotClient, fn_name).__doc__
         tool = {
             'type': 'function',
             'function': {
@@ -39,8 +38,7 @@ def main(ip_address: str):
         "content": "You control a lego robot by calling different functions that execute commands on the robot"
     }]
 
-    rpc_client = xmlrpc.client.ServerProxy(f'http://{ip_address}:8000', allow_none=True)
-    rpc_client.init()
+    robot = RobotClient(ip_address)
 
     while True:
         user_msg = input('>>> ')
@@ -68,7 +66,7 @@ def main(ip_address: str):
                     fn_args = json.loads(tool_call.function.arguments)
                     fn_args_positional = [fn_args[a] for a in get_tool_args(fn_name)]
                     print(f'    {fn_name}({fn_args_positional if len(fn_args_positional) > 0 else ""})', end='')
-                    response = getattr(rpc_client, fn_name)(*fn_args_positional)
+                    response = getattr(robot, fn_name)(*fn_args_positional)
                     print(f' -> {str(response)}')
                     history.append({
                         "role": "tool",
