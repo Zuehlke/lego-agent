@@ -1,7 +1,15 @@
 import threading
 import time
-from enum import Enum
 from typing import List
+
+from ev3dev2 import DeviceNotFound
+from ev3dev2.led import Leds
+from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_B, SpeedPercent
+from ev3dev2.sound import Sound
+from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
+from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
+
+from robot_common import Device
 
 COLOR_MAP = {
     0: "NO COLOR",
@@ -15,17 +23,6 @@ COLOR_MAP = {
 }
 
 
-class Device(Enum):
-    LIGHTS = 'Lights'
-    MOTORS = 'Motors'
-    SPEAKER = 'Speaker'
-    BUTTON = 'Button'
-    COLOR = 'Color'
-    ULTRASONIC = 'Ultrasonic'
-
-
-# TODO: Rename functions more intuitive (lights instead of leds, all like above)
-# TODO: Still need imports on method-level?
 class RobotServer:
     def __init__(self):
         self.init()
@@ -36,8 +33,6 @@ class RobotServer:
         motor_watchdog.start()
 
     def _try_init_device(self, constructor, device_name):
-        from ev3dev2 import DeviceNotFound
-
         device = None
         try:
             device = constructor()
@@ -47,37 +42,29 @@ class RobotServer:
         return device
 
     def init(self):
-        from ev3dev2.led import Leds
-        from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_B
-        from ev3dev2.sound import Sound
-        from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
-        from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
-
         self._devices = []
         self._leds = self._try_init_device(lambda: Leds(), Device.LIGHTS)
         self._tank_drive = self._try_init_device(lambda: MoveTank(OUTPUT_A, OUTPUT_B), Device.MOTORS)
         self._sound = self._try_init_device(lambda: Sound(), Device.SPEAKER)
         self._touch_sensor = self._try_init_device(lambda: TouchSensor(INPUT_1), Device.BUTTON)
         self._color_sensor = self._try_init_device(lambda: ColorSensor(INPUT_3), Device.COLOR)
-        self._ultrasonic_sensor = self._try_init_device(lambda: UltrasonicSensor(INPUT_4), Device.ULTRASONIC)
+        self._ultrasonic_sensor = self._try_init_device(lambda: UltrasonicSensor(INPUT_4), Device.DISTANCE)
 
         if Device.MOTORS in self._devices:
             self._stop_motors()
         if Device.LIGHTS in self._devices:
-            self.set_leds('BLACK', 'BLACK')
+            self.set_lights('BLACK', 'BLACK')
 
     def get_device_list(self) -> List[str]:
         return [d.value for d in self._devices]
 
-    def set_leds(self, left_color: str, right_color: str) -> None:
+    def set_lights(self, left_color: str, right_color: str) -> None:
         if self._leds is None:
-            raise IOError('LEDs not connected')
+            raise IOError('Lights not connected')
         self._leds.set_color("LEFT", left_color)
         self._leds.set_color("RIGHT", right_color)
 
     def set_motors(self, left_speed: int, right_speed: int) -> None:
-        from ev3dev2.motor import SpeedPercent
-
         if self._tank_drive is None:
             raise IOError('Motors not connected')
         self._watchdog_cnt = 0
@@ -115,7 +102,7 @@ class RobotServer:
 
     def get_distance(self) -> int:
         if self._ultrasonic_sensor is None:
-            raise IOError('Ultrasonic sensor is not connected')
+            raise IOError('Distance sensor is not connected')
         return int(self._ultrasonic_sensor.distance_centimeters)
 
     def _stop_motors(self) -> None:

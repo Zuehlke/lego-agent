@@ -3,7 +3,7 @@ import threading
 import time
 import xmlrpc.client
 
-from robot_server import Device
+from robot_common import Device
 
 
 class RobotClient:
@@ -25,26 +25,26 @@ class RobotClient:
         motor_watchdog.daemon = True
         motor_watchdog.start()
 
-    def set_leds(self, left_color: str, right_color: str) -> None:
+    def set_lights(self, left_color: str, right_color: str) -> None:
         """{
-            "description": "Set the color of the left and right LED (or turn it off by setting it to BLACK).",
+            "description": "Set the color of the left and right light (or turn it off by setting it to BLACK).",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "left_color": {
                         "type": "string",
-                        "description": "Color of left LED.",
+                        "description": "Color of left light.",
                         "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
                     },
                     "right_color": {
                         "type": "string",
-                        "description": "Color of right LED.",
+                        "description": "Color of right light.",
                         "enum": ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
                     }
                 }
             }
         }"""
-        return self._server.set_leds(left_color, right_color)
+        return self._server.set_lights(left_color, right_color)
 
     def set_motors(self, left_speed: int, right_speed: int) -> None:
         """{
