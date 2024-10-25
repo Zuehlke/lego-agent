@@ -3,6 +3,8 @@ import threading
 import time
 import xmlrpc.client
 
+from robot_server import Device
+
 
 class RobotClient:
 
@@ -13,6 +15,11 @@ class RobotClient:
         except ConnectionRefusedError:
             print("Could not connect to robot! Is the server running? Is the IP address correct?")
             sys.exit()  # not nice, but results in user-friendly error message
+
+        devices = self._server.get_device_list()
+        self._devices = [Device(d) for d in devices]
+        print(f"Connected to robot! Devices: {', '.join(d.value for d in self._devices)}")
+
         self._motor_speeds = (0, 0)
         motor_watchdog = threading.Thread(target=self._motor_watchdog)
         motor_watchdog.daemon = True
