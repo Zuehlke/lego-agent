@@ -11,10 +11,9 @@ def get_tool_args(fn_name):
     return [a for a in inspect.signature(fn).parameters if a != 'self']
 
 
-def get_tool_desc():
-    robot_functions = [f for f in dir(RobotClient) if not f.startswith('_')]
+def get_tool_desc(robot: RobotClient):
     tools = []
-    for fn_name in robot_functions:
+    for fn_name in robot.get_methods():
         doc = getattr(RobotClient, fn_name).__doc__
         tool = {
             'type': 'function',
@@ -31,14 +30,13 @@ def get_tool_desc():
 
 
 def main(ip_address: str):
-    tool_desc = get_tool_desc()
+    robot = RobotClient(ip_address)
+    tool_desc = get_tool_desc(robot)
 
     history = [{
         "role": "system",
         "content": "You control a lego robot by calling different functions that execute commands on the robot"
     }]
-
-    robot = RobotClient(ip_address)
 
     while True:
         user_msg = input('>>> ')
