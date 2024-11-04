@@ -42,6 +42,9 @@ class RobotClient:
                 methods.append(method)
         return methods
 
+    def get_devices(self) -> list[Device]:
+        return self._devices
+
     @_depends_on(Device.LIGHTS)
     def set_lights(self, left_color: str, right_color: str) -> None:
         """{
