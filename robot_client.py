@@ -97,7 +97,7 @@ class RobotClient:
                 "properties": {
                     "text": {
                         "type": "string",
-                        "description": "Text to speak."
+                        "description": "Text to speak. The text has to be in English, no other language is supported.Sa"
                     }
                 }
             }

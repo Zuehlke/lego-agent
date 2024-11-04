@@ -74,7 +74,8 @@ class RobotServer:
     def speak(self, text: str) -> None:
         if self._sound is None:
             raise IOError('Speaker is not connected')
-        self._sound.speak(text)
+        text_cleaned = text[:200].encode('ascii', errors='ignore').decode('ascii')
+        self._sound.speak(text_cleaned)
 
     def get_button(self) -> bool:
         if self._touch_sensor is None:
