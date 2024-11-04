@@ -149,6 +149,5 @@ class RobotClient:
     def _motor_watchdog(self):
         while True:
             if self._motor_speeds != (0, 0):
-                print('Setting motor speed')
                 self._server.set_motors(self._motor_speeds[0], self._motor_speeds[1])
             time.sleep(2)
