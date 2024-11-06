@@ -1,8 +1,8 @@
-import argparse
 import inspect
 import json
 import openai
 
+from config import ROBOT_IP
 from robot_client import RobotClient
 
 
@@ -29,8 +29,8 @@ def get_tool_desc(robot: RobotClient):
     return tools
 
 
-def main(ip_address: str):
-    robot = RobotClient(ip_address)
+def main():
+    robot = RobotClient(ROBOT_IP)
     tool_desc = get_tool_desc(robot)
 
     history = [{
@@ -76,8 +76,4 @@ def main(ip_address: str):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('ip_address', type=str)
-    args = parser.parse_args()
-
-    main(args.ip_address)
+    main()

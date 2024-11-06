@@ -1,14 +1,13 @@
 # WILLKOMMEN!
 
 # DIESEN TEIL HIER SOLLTEST DU NICHT ÄNDERN
-import os
 from time import sleep
 
+from config import ROBOT_IP
 from robot_client import RobotClient
 from robot_common import Device
 
-robot_ip = os.environ['ROBOT_IP']
-r = RobotClient(robot_ip)
+r = RobotClient(ROBOT_IP)
 
 # FÜGE AB HIER DEINEN CODE EIN:
 devices = r.get_devices()
