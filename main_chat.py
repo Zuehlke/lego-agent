@@ -1,9 +1,13 @@
 import inspect
 import json
 import openai
+from dotenv import load_dotenv
 
 from config import ROBOT_IP
 from robot_client import RobotClient
+
+
+load_dotenv()
 
 
 def get_tool_args(fn_name):
