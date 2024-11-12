@@ -1,0 +1,4 @@
+openai==1.46.0
+python-dotenv==1.0.1
+python-ev3dev2==2.1.0.post1
+streamlit==1.39.0
