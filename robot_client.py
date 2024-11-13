@@ -19,6 +19,7 @@ def _depends_on(*devices: Device):
 class RobotClient:
 
     def __init__(self, ip_address: str):
+        self._lock = threading.Lock()
         self._server = xmlrpc.client.ServerProxy(f'http://{ip_address}:8000', allow_none=True)
         try:
             self._server.init()
@@ -34,6 +35,10 @@ class RobotClient:
         motor_watchdog = threading.Thread(target=self._motor_watchdog)
         motor_watchdog.daemon = True
         motor_watchdog.start()
+
+    def _call_server(self, method_name, *arguments):
+        with self._lock:
+            return getattr(self._server, method_name)(*arguments)
 
     def get_methods(self) -> list[str]:
         methods = []
@@ -65,7 +70,7 @@ class RobotClient:
                 }
             }
         }"""
-        return self._server.set_lights(left_color, right_color)
+        return self._call_server('set_lights', left_color, right_color)
 
     @_depends_on(Device.MOTORS)
     def set_motors(self, left_speed: int, right_speed: int) -> None:
@@ -86,7 +91,7 @@ class RobotClient:
             }
         }"""
         self._motor_speeds = (left_speed, right_speed)
-        self._server.set_motors(left_speed, right_speed)
+        self._call_server('set_motors', left_speed, right_speed)
 
     @_depends_on(Device.SPEAKER)
     def speak(self, text: str) -> None:
@@ -102,7 +107,7 @@ class RobotClient:
                 }
             }
         }"""
-        return self._server.speak(text)
+        self._call_server('speak', text)
 
     @_depends_on(Device.BUTTON)
     def get_button(self) -> bool:
@@ -110,7 +115,7 @@ class RobotClient:
             "description": "Get the value of the touch sensor, whether it's pressed or not.",
             "parameters": {}
         }"""
-        return self._server.get_button()
+        return self._call_server('get_button')
 
     @_depends_on(Device.BUTTON)
     def wait_button_pressed(self) -> None:
@@ -118,7 +123,7 @@ class RobotClient:
             "description": "Function which blocks until the touch sensor is pressed.",
             "parameters": {}
         }"""
-        while not self._server.wait_button_pressed():
+        while not self._call_server('wait_button_pressed'):
             pass
 
     @_depends_on(Device.BUTTON)
@@ -127,7 +132,7 @@ class RobotClient:
             "description": "Function which blocks until the touch sensor is released.",
             "parameters": {}
         }"""
-        while not self._server.wait_button_released():
+        while not self._call_server('wait_button_released'):
             pass
 
     @_depends_on(Device.COLOR)
@@ -136,7 +141,7 @@ class RobotClient:
             "description": "Get the color which is detected by the color sensor.",
             "parameters": {}
         }"""
-        return self._server.get_color()
+        return self._call_server('get_color')
 
     @_depends_on(Device.DISTANCE)
     def get_distance(self) -> int:
@@ -144,10 +149,10 @@ class RobotClient:
             "description": "Get the distance which is detected by the distance sensor, value in centimeters.",
             "parameters": {}
         }"""
-        return self._server.get_distance()
+        return self._call_server('get_distance')
 
     def _motor_watchdog(self):
         while True:
             if self._motor_speeds != (0, 0):
-                self._server.set_motors(self._motor_speeds[0], self._motor_speeds[1])
+                self._call_server('set_motors', self._motor_speeds[0], self._motor_speeds[1])
             time.sleep(2)
