@@ -42,6 +42,7 @@ class RobotServer:
         return device
 
     def init(self):
+        # Make sure these ports are in sync with the information in the README.
         self._devices = []
         self._leds = self._try_init_device(lambda: Leds(), Device.LIGHTS)
         self._tank_drive = self._try_init_device(lambda: MoveTank(OUTPUT_A, OUTPUT_D), Device.MOTORS)

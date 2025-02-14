@@ -21,11 +21,7 @@ class RobotClient:
     def __init__(self, ip_address: str):
         self._lock = threading.Lock()
         self._server = xmlrpc.client.ServerProxy(f'http://{ip_address}:8000', allow_none=True)
-        try:
-            self._server.init()
-        except ConnectionRefusedError:
-            print("Could not connect to robot! Is the server running? Is the IP address correct?")
-            sys.exit()  # not nice, but results in user-friendly error message
+        self._server.init()
 
         devices = self._server.get_device_list()
         self._devices = [Device(d) for d in devices]
