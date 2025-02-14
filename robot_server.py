@@ -7,7 +7,7 @@ from ev3dev2.led import Leds
 from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_B, SpeedPercent
 from ev3dev2.sound import Sound
 from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
-from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
+from ev3dev2.sensor.lego import TouchSensor, ColorSensor, InfraredSensor
 
 from robot_common import Device
 
@@ -48,7 +48,7 @@ class RobotServer:
         self._sound = self._try_init_device(lambda: Sound(), Device.SPEAKER)
         self._touch_sensor = self._try_init_device(lambda: TouchSensor(INPUT_1), Device.BUTTON)
         self._color_sensor = self._try_init_device(lambda: ColorSensor(INPUT_3), Device.COLOR)
-        self._ultrasonic_sensor = self._try_init_device(lambda: UltrasonicSensor(INPUT_4), Device.DISTANCE)
+        self._ultrasonic_sensor = self._try_init_device(lambda: InfraredSensor(INPUT_4), Device.DISTANCE)
 
         if Device.MOTORS in self._devices:
             self._stop_motors()
@@ -104,7 +104,7 @@ class RobotServer:
     def get_distance(self) -> int:
         if self._ultrasonic_sensor is None:
             raise IOError('Distance sensor is not connected')
-        return int(self._ultrasonic_sensor.distance_centimeters)
+        return int(self._ultrasonic_sensor.proximity * 0.7)
 
     def _stop_motors(self) -> None:
         self.set_motors(0, 0)
