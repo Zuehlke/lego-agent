@@ -4,7 +4,7 @@ from typing import List
 
 from ev3dev2 import DeviceNotFound
 from ev3dev2.led import Leds
-from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_B, SpeedPercent
+from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_D, SpeedPercent
 from ev3dev2.sound import Sound
 from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor, ColorSensor, InfraredSensor
@@ -44,7 +44,7 @@ class RobotServer:
     def init(self):
         self._devices = []
         self._leds = self._try_init_device(lambda: Leds(), Device.LIGHTS)
-        self._tank_drive = self._try_init_device(lambda: MoveTank(OUTPUT_A, OUTPUT_B), Device.MOTORS)
+        self._tank_drive = self._try_init_device(lambda: MoveTank(OUTPUT_A, OUTPUT_D), Device.MOTORS)
         self._sound = self._try_init_device(lambda: Sound(), Device.SPEAKER)
         self._touch_sensor = self._try_init_device(lambda: TouchSensor(INPUT_1), Device.BUTTON)
         self._color_sensor = self._try_init_device(lambda: ColorSensor(INPUT_3), Device.COLOR)
@@ -69,7 +69,7 @@ class RobotServer:
             raise IOError('Motors not connected')
         self._watchdog_cnt = 0
         self._watchdog_enabled = True
-        self._tank_drive.on(SpeedPercent(left_speed), SpeedPercent(right_speed))
+        self._tank_drive.on(SpeedPercent(-left_speed), SpeedPercent(-right_speed))  # invert due to caterpillar tracks
 
     def speak(self, text: str) -> None:
         if self._sound is None:
