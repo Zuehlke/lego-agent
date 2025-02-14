@@ -1,9 +1,10 @@
 import inspect
 import json
+import os
+
 import openai
 from dotenv import load_dotenv
 
-from config import ROBOT_IP
 from robot_client import RobotClient
 
 
@@ -34,7 +35,7 @@ def get_tool_desc(robot: RobotClient):
 
 
 def main():
-    robot = RobotClient(ROBOT_IP)
+    robot = RobotClient(os.environ['ROBOT_IP'])
     tool_desc = get_tool_desc(robot)
 
     history = [{
