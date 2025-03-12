@@ -98,7 +98,7 @@ class RobotClient:
                 "properties": {
                     "text": {
                         "type": "string",
-                        "description": "Text to speak. The text has to be in English, no other language is supported.Sa"
+                        "description": "Text to speak. The text has to be in English, no other language is supported. Special signs like apostrophe or so are not supported, only alphanumerical characters."
                     }
                 }
             }

@@ -18,6 +18,7 @@ Connect the following hardware to the EV3 block:
 - Ultrasonic sensor to port 4
 
 Connect the robot to the same wifi as your laptop. Upon successful connection, the IP is shown on the top left.
+The robot only supports 2.4 GHz networks.
 
 In the file browser, select _run_server.py_ and wait until the light are no longer blinking. 
 
