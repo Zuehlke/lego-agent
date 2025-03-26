@@ -1,5 +1,6 @@
 import threading
 import time
+from enum import Enum
 from typing import List
 
 from ev3dev2 import DeviceNotFound
@@ -9,7 +10,15 @@ from ev3dev2.sound import Sound
 from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor, ColorSensor, InfraredSensor
 
-from robot_common import Device
+
+class Device(Enum):
+    LIGHTS = 'Lights'
+    MOTORS = 'Motors'
+    SPEAKER = 'Speaker'
+    BUTTON = 'Button'
+    COLOR = 'Color'
+    DISTANCE = 'Distance'
+
 
 COLOR_MAP = {
     0: "NO COLOR",
