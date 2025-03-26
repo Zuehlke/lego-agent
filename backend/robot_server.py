@@ -18,18 +18,6 @@ class Device(Enum):
     DISTANCE = 'Distance'
 
 
-COLOR_MAP = {
-    0: "NO COLOR",
-    1: "BLACK",
-    2: "BLUE",
-    3: "GREEN",
-    4: "YELLOW",
-    5: "RED",
-    6: "WHITE",
-    7: "BROWN"
-}
-
-
 class RobotServer:
     def __init__(self):
         self.init()
