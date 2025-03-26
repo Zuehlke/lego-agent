@@ -1,0 +1,33 @@
+@baseUrl = http://<robot-ip>:5000
+
+###
+GET {{baseUrl}}/list_devices
+
+###
+POST {{baseUrl}}/set_motors
+Content-Type: application/json
+
+{
+  "left_speed": 20,
+  "right_speed": -20
+}
+
+###
+POST {{baseUrl}}/set_motors
+Content-Type: application/json
+
+{
+  "left_speed": 0,
+  "right_speed": 0
+}
+
+###
+POST {{baseUrl}}/speak
+Content-Type: application/json
+
+{
+  "text": "Hello world"
+}
+
+###
+GET {{baseUrl}}/get_distance
