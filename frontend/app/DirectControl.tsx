@@ -32,6 +32,7 @@ export default function DirectControl({ robotClient }: Props) {
 
   return (
     <div>
+      <h2>Robot Manual Control</h2>
       <div>
         <h3>Set Motors</h3>
         <input
