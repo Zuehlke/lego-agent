@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {OpenAI} from 'openai';
 import RobotClient from './robot_client';
 import {OPENAI_API_KEY} from './config';
+import {toolDescriptions, getToolDescChat} from './tools';
 
 interface ChatMessage {
   role: string;
@@ -18,82 +19,6 @@ interface ChatMessage {
 
 const openai = new OpenAI({apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true});
 
-const toolDescriptions: {
-  [key: string]: {
-    description: string;
-    parameters: any;
-  };
-} = {
-  setLights: {
-    description: "Set the color of the left and right light (or turn it off by setting it to BLACK).",
-    parameters: {
-      type: "object",
-      properties: {
-        leftColor: {
-          type: "string",
-          description: "Color for left light",
-          enum: ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
-        },
-        rightColor: {
-          type: "string",
-          description: "Color for right light",
-          enum: ["BLACK", "RED", "GREEN", "AMBER", "ORANGE", "YELLOW"]
-        }
-      },
-      required: ["leftColor", "rightColor"],
-      additionalProperties: false
-    }
-  },
-  setMotors: {
-    description: "Set the speed of the left and right motor (or turn it off by setting it to 0).",
-    parameters: {
-      type: "object",
-      properties: {
-        leftSpeed: {
-          type: "number",
-          description: "Speed of left motor, from -100 (full backwards) to 100 (full forwards)."
-        },
-        rightSpeed: {
-          type: "number",
-          description: "Speed of right motor, from -100 (full backwards) to 100 (full forwards)."
-        }
-      },
-      required: ["leftSpeed", "rightSpeed"],
-      additionalProperties: false
-    }
-  },
-  speak: {
-    description: "Speak a text via the speaker of the robot.",
-    parameters: {
-      type: "object",
-      properties: {
-        text: {
-          type: "string",
-          description: "Text to speak. The text has to be in English, no other language is supported. Special signs like apostrophe or so are not supported, only alphanumerical characters."
-        }
-      },
-      required: ["text"],
-      additionalProperties: false
-    }
-  },
-  getDistance: {
-    description: "\"Get the distance which is detected by the distance sensor, value in centimeters.",
-    parameters: {type: "object", properties: {}, additionalProperties: false}
-  }
-};
-
-function getToolDesc() {
-  return Object.entries(toolDescriptions).map(([name, meta]) => ({
-    type: "function",
-    function: {
-      name,
-      description: meta.description,
-      parameters: meta.parameters,
-      strict: true
-    }
-  }));
-}
-
 interface Props {
   robotClient: RobotClient;
 }
@@ -109,11 +34,10 @@ export default function ChatControl({robotClient}: Props) {
   const [loading, setLoading] = useState(false);
 
   const callChatApi = async (currentHistory: ChatMessage[]): Promise<ChatMessage> => {
-    const tools = getToolDesc();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o", // adjust to your model (e.g. "gpt-4")
       messages: currentHistory,
-      tools,
+      tools: getToolDescChat(),
       store: true,
     });
     return completion.choices[0].message;
@@ -138,7 +62,7 @@ export default function ChatControl({robotClient}: Props) {
           let toolResult: any;
           try {
             const parsedArgs = JSON.parse(toolCall.function.arguments);
-            const requiredArgs = toolDescriptions[toolCall.function.name]?.parameters.required || [];
+            const requiredArgs = toolDescriptions[toolCall.function.name].parameters.required;
             const argsArray = requiredArgs.map(key => parsedArgs[key]);
             toolResult = await (robotClient as any)[toolCall.function.name](...argsArray);
           } catch (err: any) {
