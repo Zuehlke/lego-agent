@@ -12,9 +12,9 @@ export default function VoiceControl({robotClient}: Props) {
   const [status, setStatus] = useState<"disconnected" | "connecting" | "connected">("disconnected");
   const peerConnection = useRef<RTCPeerConnection>(null);
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
-  const [events, setEvents] = useState([]);  // TODO: Are events needed?
   const audioElement = useRef<HTMLAudioElement>(null);
   const [listening, setListening] = useState(true);
+  const [functionCalls, setFunctionCalls] = useState<{name: string, args: string, result: string}[]>([]);
 
   async function startSession() {
     setStatus("connecting");
@@ -83,7 +83,7 @@ export default function VoiceControl({robotClient}: Props) {
       if (!message.timestamp) {
         message.timestamp = timestamp;
       }
-      setEvents((prev) => [message, ...prev]);
+      console.log(message)
     }
   }
 
@@ -95,7 +95,7 @@ export default function VoiceControl({robotClient}: Props) {
         if (!event.timestamp) {
           event.timestamp = new Date().toLocaleTimeString();
         }
-        setEvents((prev) => [event, ...prev]);
+        console.log(event)
 
         if (event.type === "session.created") {
           sendClientEvent({
@@ -108,7 +108,6 @@ export default function VoiceControl({robotClient}: Props) {
             }
           });
           setStatus("connected");
-          setEvents([]);
         } else if (event.type === "output_audio_buffer.started") {
           setListening(false);
         } else if (event.type === "output_audio_buffer.stopped") {
@@ -135,6 +134,11 @@ export default function VoiceControl({robotClient}: Props) {
                   output: String(toolResult)
                 }
               });
+              setFunctionCalls((prev) => [{
+                name: output.name,
+                args: output.arguments,
+                result: String(toolResult)
+              }, ...prev])
             }
           }))
           if(function_called) {
@@ -145,7 +149,6 @@ export default function VoiceControl({robotClient}: Props) {
     }
   }, [dataChannel]);
 
-  // TODO: Show function calls and results
   return (
     <div>
       <h2>Robot Voice Control</h2>
@@ -156,9 +159,9 @@ export default function VoiceControl({robotClient}: Props) {
       {status === "connected" && (
         <p>Turn: {listening ? "Listening" : "Speaking"}</p>
       )}
-      <p>Events:</p>
-      {events.map((event, i) => (
-        <div key={i}><b>{event.type}</b>{JSON.stringify(event)}</div>
+      <p>Function Calls:</p>
+      {functionCalls.map((call, i) => (
+        <div key={i}><b>{call.name}</b> {call.args}: {call.result}</div>
       ))}
     </div>
   );

@@ -10,7 +10,7 @@ export default function RobotControl() {
   const [ip, setIp] = useState('');
   const [robotClient, setRobotClient] = useState<RobotClient | null>(null);
   const [status, setStatus] = useState<string>('disconnected');
-  const [activeTab, setActiveTab] = useState<string>('voice');
+  const [activeTab, setActiveTab] = useState<string>('chat');
 
   const handleConfirm = async () => {
     setStatus('connecting...');
