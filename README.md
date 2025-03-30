@@ -47,6 +47,12 @@ The following credentials are used:
 
 **Hint:** Given the default credentials, and also the unprotected REST API, it's recommended to only use the robot in a trusted network.
 
+## Mock API
+
+If you want to test the frontend without the robot, you can use the mock API.
+For this, navigate to the backend directory and run `uv run run_mock_server.py`.
+You'll have to have [uv](https://docs.astral.sh/uv/) installed for this.
+
 ## Troubleshooting
 
 If you cannot connect to the robot, check the following:
