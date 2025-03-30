@@ -1,7 +1,7 @@
 import React from 'react';
 import {useEffect, useRef, useState} from "react";
 import RobotClient from './robot_client';
-import {OPENAI_API_KEY} from './config';
+import {model_voice, OPENAI_API_KEY, voice} from './config';
 import {getToolDescVoice, toolDescriptions} from "@/app/tools";
 
 interface Props {
@@ -14,6 +14,7 @@ export default function VoiceControl({robotClient}: Props) {
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
   const [events, setEvents] = useState([]);  // TODO: Are events needed?
   const audioElement = useRef<HTMLAudioElement>(null);
+  const [listening, setListening] = useState(true);
 
   async function startSession() {
     setStatus("connecting");
@@ -35,11 +36,7 @@ export default function VoiceControl({robotClient}: Props) {
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    // TODO: Model selection, and also more settings like voice, stop-control, etc.
-    // TODO: In general all settings, also in chat; move to config.tsx?
-    const baseUrl = "https://api.openai.com/v1/realtime";
-    const model = "gpt-4o-realtime-preview-2024-12-17";
-    const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
+    const sdpResponse = await fetch(`https://api.openai.com/v1/realtime?model=${model_voice}`, {
       method: "POST",
       body: offer.sdp,
       headers: {
@@ -100,14 +97,22 @@ export default function VoiceControl({robotClient}: Props) {
         }
         setEvents((prev) => [event, ...prev]);
 
-        // TODO: Send system message somewhere and voice model
         if (event.type === "session.created") {
           sendClientEvent({
             type: "session.update",
-            session: {tools: getToolDescVoice(), tool_choice: "auto"}
+            session: {
+              instructions: "You control a lego robot by calling different functions that execute commands on the robot. Talk as if you're the robot, don't talk about the robot in 3rd person.",
+              voice,
+              tools: getToolDescVoice(),
+              tool_choice: "auto"
+            }
           });
           setStatus("connected");
           setEvents([]);
+        } else if (event.type === "output_audio_buffer.started") {
+          setListening(false);
+        } else if (event.type === "output_audio_buffer.stopped") {
+          setListening(true);
         } else if (event.type === "response.done" && event.response.output) {
           let function_called = false;
           await Promise.all(event.response.output.map(async (output) => {
@@ -119,11 +124,6 @@ export default function VoiceControl({robotClient}: Props) {
                 const requiredArgs = toolDescriptions[output.name].parameters.required;
                 const argsArray = requiredArgs.map(key => parsedArgs[key]);
                 toolResult = await (robotClient as any)[output.name](...argsArray);
-                if (toolResult) {
-                  toolResult = toolResult.toString();
-                } else {
-                toolResult = "null";
-              }
               } catch (err: any) {
                 toolResult = `Error calling function "${output.name}": ${err.message}`;
               }
@@ -132,7 +132,7 @@ export default function VoiceControl({robotClient}: Props) {
                 item: {
                   type: "function_call_output",
                   call_id: output.call_id,
-                  output: toolResult
+                  output: String(toolResult)
                 }
               });
             }
@@ -145,7 +145,6 @@ export default function VoiceControl({robotClient}: Props) {
     }
   }, [dataChannel]);
 
-  // TODO: Show somehow if speaking or listening
   // TODO: Show function calls and results
   return (
     <div>
@@ -154,9 +153,12 @@ export default function VoiceControl({robotClient}: Props) {
         {status === "connected" ? "Stop" : "Start"} Session
       </button>
       <p>Status: {status}</p>
+      {status === "connected" && (
+        <p>Turn: {listening ? "Listening" : "Speaking"}</p>
+      )}
       <p>Events:</p>
       {events.map((event, i) => (
-        <div key={i}>{JSON.stringify(event)}</div>
+        <div key={i}><b>{event.type}</b>{JSON.stringify(event)}</div>
       ))}
     </div>
   );

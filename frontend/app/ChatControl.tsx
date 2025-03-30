@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {OpenAI} from 'openai';
 import RobotClient from './robot_client';
-import {OPENAI_API_KEY} from './config';
+import {model_chat, OPENAI_API_KEY} from './config';
 import {toolDescriptions, getToolDescChat} from './tools';
 
 interface ChatMessage {
@@ -35,7 +35,7 @@ export default function ChatControl({robotClient}: Props) {
 
   const callChatApi = async (currentHistory: ChatMessage[]): Promise<ChatMessage> => {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", // adjust to your model (e.g. "gpt-4")
+      model: model_chat,
       messages: currentHistory,
       tools: getToolDescChat(),
       store: true,
@@ -71,7 +71,7 @@ export default function ChatControl({robotClient}: Props) {
           const toolResponseMsg: ChatMessage = {
             role: 'tool',
             tool_call_id: toolCall.id,
-            content: `Response from "${toolCall.function.name}": ${String(toolResult)}`
+            content: String(toolResult)
           };
           updatedHistory = [...updatedHistory, toolResponseMsg];
           setHistory(updatedHistory);
@@ -85,32 +85,34 @@ export default function ChatControl({robotClient}: Props) {
 
   function mapHistoryForVisualization(history: ChatMessage[]): ChatMessage[] {
     const visualizedHistory: ChatMessage[] = [];
-    history.forEach((msg) => {
-      if (msg.role !== "assistant") {
-        visualizedHistory.push(msg);
-      } else {
-        const hasContent = msg.content && msg.content.trim().length > 0;
-        const hasToolCalls = msg.tool_calls && msg.tool_calls.length > 0;
-        if (hasContent && hasToolCalls) {
-          visualizedHistory.push({...msg, tool_calls: undefined});
-          msg.tool_calls!.forEach((toolCall) => {
-            visualizedHistory.push({
-              role: "assistant",
-              content: `Tool call: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`,
-            });
-          });
-        } else if (hasToolCalls) {
-          msg.tool_calls!.forEach((toolCall) => {
-            visualizedHistory.push({
-              role: "assistant",
-              content: `Tool call: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`,
-            });
-          });
-        } else {
+    history
+      .filter((msg) => msg.role !== 'system')
+      .forEach((msg) => {
+        if (msg.role !== "assistant") {
           visualizedHistory.push(msg);
+        } else {
+          const hasContent = msg.content && msg.content.trim().length > 0;
+          const hasToolCalls = msg.tool_calls && msg.tool_calls.length > 0;
+          if (hasContent && hasToolCalls) {
+            visualizedHistory.push({...msg, tool_calls: undefined});
+            msg.tool_calls!.forEach((toolCall) => {
+              visualizedHistory.push({
+                role: "assistant",
+                content: `Tool call: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`,
+              });
+            });
+          } else if (hasToolCalls) {
+            msg.tool_calls!.forEach((toolCall) => {
+              visualizedHistory.push({
+                role: "assistant",
+                content: `Tool call: ${toolCall.function.name} with arguments: ${toolCall.function.arguments}`,
+              });
+            });
+          } else {
+            visualizedHistory.push(msg);
+          }
         }
-      }
-    });
+      });
     return visualizedHistory;
   }
 
