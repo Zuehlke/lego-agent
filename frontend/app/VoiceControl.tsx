@@ -12,7 +12,7 @@ export default function VoiceControl({robotClient}: Props) {
   const [status, setStatus] = useState<"disconnected" | "connecting" | "connected">("disconnected");
   const peerConnection = useRef<RTCPeerConnection>(null);
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([]);  // TODO: Are events needed?
   const audioElement = useRef<HTMLAudioElement>(null);
 
   async function startSession() {
@@ -93,42 +93,54 @@ export default function VoiceControl({robotClient}: Props) {
   useEffect(() => {
     if (dataChannel) {
       // Append new server events to the list
-      dataChannel.addEventListener("message", (e) => {
+      dataChannel.addEventListener("message", async (e) => {
         const event = JSON.parse(e.data);
         if (!event.timestamp) {
           event.timestamp = new Date().toLocaleTimeString();
         }
         setEvents((prev) => [event, ...prev]);
 
+        // TODO: Send system message somewhere and voice model
         if (event.type === "session.created") {
           sendClientEvent({
             type: "session.update",
             session: {tools: getToolDescVoice(), tool_choice: "auto"}
           });
+          setStatus("connected");
+          setEvents([]);
         } else if (event.type === "response.done" && event.response.output) {
-          event.response.output.forEach(async (output) => {
+          let function_called = false;
+          await Promise.all(event.response.output.map(async (output) => {
             if (output.type == "function_call") {
+              function_called = true;
               let toolResult: any;
               try {
                 const parsedArgs = JSON.parse(output.arguments);
                 const requiredArgs = toolDescriptions[output.name].parameters.required;
                 const argsArray = requiredArgs.map(key => parsedArgs[key]);
                 toolResult = await (robotClient as any)[output.name](...argsArray);
+                if (toolResult) {
+                  toolResult = toolResult.toString();
+                } else {
+                toolResult = "null";
+              }
               } catch (err: any) {
                 toolResult = `Error calling function "${output.name}": ${err.message}`;
               }
               sendClientEvent({
-                type: "response.create",
-                response: toolResult,  // TODO: How would it know which tool call this came from?
+                type: "conversation.item.create",
+                item: {
+                  type: "function_call_output",
+                  call_id: output.call_id,
+                  output: toolResult
+                }
               });
             }
-          })
+          }))
+          if(function_called) {
+            sendClientEvent({type: "response.create"})
+          }
         }
-      });
-
-      dataChannel.addEventListener("open", () => {
-        setStatus("connected");
-        setEvents([]);
       });
     }
   }, [dataChannel]);
