@@ -4,10 +4,9 @@ This repository contains all code to control a Mindstorms EV3 Lego Robot via a s
 
 ## Setup Repo
 
-Make sure you have [uv](https://docs.astral.sh/uv/) installed, then navigate to this directoy and run `uv sync`.
+Make sure you have [node.js](https://nodejs.org/) installed, then navigate to the frontend directory and run `npm install`.
 
-Furthermore, copy _.env.template_ to _.env_ and populate the variables.
-The IP address can be found on the robot screen (see below).
+Furthermore, copy _frontend/app/config.template.tsx_ to _frontend/app/config.tsx_ and fill in your OpenAI API key.
 
 ## Prepare Robot
 
@@ -17,15 +16,17 @@ Connect the following hardware to the EV3 block:
 - Right motor to port D
 - Ultrasonic sensor to port 4
 
-Connect the robot to the same wifi as your laptop. Upon successful connection, the IP is shown on the top left.
-The robot only supports 2.4 GHz networks.
+Connect the robot to the same Wi-Fi as your laptop. The robot only supports 2.4 GHz networks.
+Upon successful connection, the IP is shown on the top left. Make sure you write it down, since you need it later.
 
-In the file browser, select _run_server.py_ and wait until the light are no longer blinking. 
+In the file browser, select _run_server.py_ and wait until the lights are no longer blinking. 
 
 ## Control Robot
 
-You can either run a fixed script by executing `uv run main_script.py` or a flexible chat with `uv run main_chat.py`.
-In both cases, a small log-statement shows you if it was possible to connect to the robot, including the hardware which was recognized by the robot.
+Navigate to the frontend directory and run `npm run dev`.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
+Use the IP of the robot to connect to it.
+Once connected, you should see that it recognized the following hardware: **Lights, Motors, Speaker, Distance**.
 
 ## Battery
 
@@ -38,20 +39,22 @@ To prevent potential damage to the EV3 block, it's recommended to remove the bat
 ## SSH
 
 The robot exposes an SSH interface on the default port.
-This can be used to copy over files via sftp.
+This can be used to copy over the backend files via sftp.
 The following credentials are used:
 
 - Username: _robot_
 - Passwort: _maker_
 
+**Hint:** Given the default credentials, and also the unprotected REST API, it's recommended to only use the robot in a trusted network.
+
 ## Troubleshooting
 
-If you cannot connect to the robot (`ConnectionRefusedError`), check the following:
+If you cannot connect to the robot, check the following:
 
 - Is the robot still in the wifi? Sometimes it disconnects, in which case a reboot helps.
 - Is the robot and your laptop in the __same__ wifi?
-- Is the IP of the robot correctly configured in _.env_?
 - Is the server on the robot running (_run_server.py_)?
+- Was the IP of the robot correctly entered?
 
 If you can connect, but a specific sensor or actor is not working, check if it's connected at the right location.
 Optionally plug it out and in again or replace the cable.
