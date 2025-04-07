@@ -1,23 +1,32 @@
 'use client';
 
 import React, {useState} from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RobotClient from './robot_client';
 import DirectControl from "@/app/DirectControl";
 import ChatControl from "@/app/ChatControl";
 import VoiceControl from "@/app/VoiceControl";
+import {
+  faCode,
+  faHeadset,
+  faKeyboard,
+} from "@fortawesome/free-solid-svg-icons";
+import zuehlkeLogo from '@/app/img/logo.png';
 
 export default function RobotControl() {
   const [ip, setIp] = useState('');
   const [robotClient, setRobotClient] = useState<RobotClient | null>(null);
   const [status, setStatus] = useState<string>('disconnected');
+  const [devices, setDevices] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<string>('chat');
+  const CONNECTED_STRING = "Connected";
 
   const handleConfirm = async () => {
     setStatus('connecting...');
     try {
-      const client = new RobotClient(ip);
-      const devices = await client.getDevices();
-      setStatus(`connected: ${devices.join(', ')}`);
+      const client = new RobotClient(ip || "localhost");
+      setDevices(await client.getDevices());
+      setStatus(CONNECTED_STRING);
       setRobotClient(client);
     } catch (err) {
       setStatus('connection failed');
@@ -39,29 +48,52 @@ export default function RobotControl() {
   };
 
   return (
-    <div>
-      <input
-        type="text"
-        value={ip}
-        style={{border: "1px solid black"}}
-        onChange={(e) => setIp(e.target.value)}
-        onKeyUp={(e) => {
-          if (e.key === 'Enter') handleConfirm();
-        }}
-        placeholder="Enter robot IP"
-      />
-      <button onClick={handleConfirm}>Confirm</button>
-      <p>Status: {status}</p>
-      {robotClient && (
+  <div className='flex flex-row bg-fuchsia-200'>
+    <div className="flex flex-col justify-between bg-fuchsia-700 text-white h-screen w-40 p-4">
+      <div>
+        <img src={zuehlkeLogo.src} alt='Zühlke Logo' />
+        <div className='flex flex-col gap-5'>
+          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} />
+          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")}  />
+          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")}  />
+        </div>
+      </div>
+      { !!robotClient ? 
+        <div className='border p-3' onClick={() => setRobotClient(null)}>
+          <p>{ip}</p>
+          { devices.map(device => {
+            return (<p key={device}>{device}</p>)
+          }) }
+        </div>
+        : null
+      }
+      
+    </div>
+
+    <div className='flex items-center justify-center h-screen'>
+      { !!!robotClient ?
+        <div className='mx-auto flex flex-col max-w-sm items-center gap-x-4 gap-y-3 rounded-xl p-5 shadow-lg outline dark:bg-fuchsia-700 dark:shadow-2xl'>
+          <input
+            className='bg-white'
+            type="text"
+            value={ip}
+            style={{border: "1px solid black"}}
+            onChange={(e) => setIp(e.target.value)}
+            onKeyUp={(e) => {
+              if (e.key === 'Enter') handleConfirm();
+            }}
+            placeholder="Enter robot IP"
+          />
+          <p>Status: {status}</p>
+          <button className="bg-sky-500 hover:bg-sky-700 rounded-2xl p-1" onClick={handleConfirm}>Confirm</button>
+        </div>
+        :
         <div>
-          <select onChange={(e) => setActiveTab(e.target.value)} value={activeTab}>
-            <option value="chat">Chat Control</option>
-            <option value="voice">Voice Control</option>
-            <option value="direct">(Debug) Direct Control</option>
-          </select>
           {renderActiveTab()}
         </div>
-      )}
+      }
     </div>
+  </div>
+    
   );
 }
