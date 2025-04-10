@@ -161,10 +161,10 @@ export default function VoiceControl({robotClient}: Props) {
     <div className='flex flex-row h-full w-full p-3'>
       <div className='flex flex-col flex-1 p-3 justify-center gap-20'>
         <button disabled={status === "connecting"} onClick={status === "connected" ? stopSession : startSession} className='hover:cursor-pointer'>
-          <FontAwesomeIcon size='10x' icon={status === "connected" ? faMicrophone : faMicrophoneSlash} className={(status === "connected" ? "shadow-white bg-white rounded-4xl" : "") + " p-2"} />
+          <FontAwesomeIcon size='10x' icon={status === "connected" ? faMicrophone : faMicrophoneSlash} className={(status === "connected" ? "shadow-white bg-white rounded-full" : "") + " p-2"} />
         </button>
         <button disabled={true} >
-          <FontAwesomeIcon size='10x' className={( status === "connected" && listening ? "shadow-white bg-white rounded-4xl" : "") + " flex p-2"} icon={ status === "disconnected" ? (
+          <FontAwesomeIcon size='10x' className={( status === "connected" && listening ? "shadow-white bg-white rounded-full p-8" : "") + " flex p-2"} icon={ status === "disconnected" ? (
             faBed
             ) : ( status === "connecting" ? 
               faPlaneDeparture
