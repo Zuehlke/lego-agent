@@ -3,3 +3,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.selected {
+  box-shadow: 0 0 10px #000, 0 0 20px #000, 0 0 30px #000;
+}

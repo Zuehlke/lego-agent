@@ -3,6 +3,8 @@ import {useEffect, useRef, useState} from "react";
 import RobotClient from './robot_client';
 import {model_voice, OPENAI_API_KEY, voice} from './config';
 import {getToolDescVoice, toolDescriptions} from "@/app/tools";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBed, faEarListen, faMicrophone, faMicrophoneSlash, faPlaneDeparture, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   robotClient: RobotClient;
@@ -150,19 +152,32 @@ export default function VoiceControl({robotClient}: Props) {
   }, [dataChannel]);
 
   return (
-    <div>
-      <h2>Robot Voice Control</h2>
-      <button disabled={status === "connecting"} onClick={status === "connected" ? stopSession : startSession}>
-        {status === "connected" ? "Stop" : "Start"} Session
-      </button>
-      <p>Status: {status}</p>
-      {status === "connected" && (
-        <p>Turn: {listening ? "Listening" : "Speaking"}</p>
-      )}
-      <p>Function Calls:</p>
-      {functionCalls.map((call, i) => (
-        <div key={i}><b>{call.name}</b> {call.args}: {call.result}</div>
-      ))}
+    <div className='flex flex-row h-full w-full'>
+      <div className='flex flex-col flex-1 p-3 justify-center gap-10'>
+        <button disabled={status === "connecting"} onClick={status === "connected" ? stopSession : startSession}>
+          <FontAwesomeIcon size='10x' icon={status === "connected" ? faMicrophone : faMicrophoneSlash} />
+        </button>
+        <FontAwesomeIcon size='10x' icon={ status === "disconnected" ? (
+          faBed
+          ) : ( status === "connecting" ? 
+            faPlaneDeparture
+            : ( listening ? 
+              faEarListen
+              : faVolumeHigh
+            )
+          )
+        } />
+        
+      </div>
+      <div className='flex-1 p-3'>
+        <div className='p-4 rounded-2xl bg-purple-500 flex-1 h-full'>
+          <div className='border-2 h-full p-3 overflow-y-auto bg-purple-300 flex-none'>
+            {functionCalls.map((call, i) => (
+              <div key={i}><b>{call.name}</b> {call.args}: {call.result}</div>
+            ))}
+          </div>
+        </div>
+      </div>     
     </div>
   );
 };

@@ -168,11 +168,10 @@ export default function ChatControl({robotClient}: Props) {
 
   return (
     <div className='p-3 h-full'>
-      <h2>Robot Chat Control</h2>
       <div className='flex flex-row h-9/10'>
         <div className='p-3 w-1/2'>
-          <div className='flex flex-col p-4 rounded-2xl bg-fuchsia-700 h-full'>
-            <div className='flex flex-col flex-grow border-2 p-3 mb-3 overflow-y-auto'>
+          <div className='flex flex-col p-4 rounded-2xl bg-purple-500 h-full'>
+            <div className='flex flex-col flex-grow border-2 p-3 mb-3 overflow-y-auto bg-purple-300'>
               {mapChatHistory(history).map((msg, idx) => (
                 <div key={idx} className='mb-1'>
                   <strong>{msg.role}:</strong> {msg.content}
@@ -198,17 +197,17 @@ export default function ChatControl({robotClient}: Props) {
           </div>
         </div>
         <div className='flex flex-col w-1/2 p-3 gap-6'>
-          <div className='p-4 rounded-2xl bg-fuchsia-700 flex-1 max-h-1/2'>
-            <div className='border-2 h-full p-3 overflow-y-auto'>
+          <div className='p-4 rounded-2xl bg-purple-500 flex-1'>
+            <div className='border-2 h-full p-3 overflow-y-auto bg-purple-300 flex-none'>
               {mapToolCallHistory(history).map((msg, idx) => (
-                <div key={idx} className='mb-1'>
+                <div key={idx} >
                   <strong>{msg.role}:</strong> {msg.content}
                 </div>
               ))}
             </div>
           </div>
-          <div className='p-4 rounded-2xl bg-fuchsia-700 flex-1  max-h-1/2'>
-            <div className='border-2 h-full p-3 overflow-y-auto'>
+          <div className='p-4 rounded-2xl bg-purple-500 flex-1'>
+            <div className='border-2 h-full p-3 overflow-y-auto bg-purple-300 flex-none'>
               {mapToolHistory(history).map((msg, idx) => (
                 <div key={idx} className='mb-1'>
                   <strong>{msg.role}:</strong> {msg.content}

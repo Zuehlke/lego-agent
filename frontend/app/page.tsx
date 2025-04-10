@@ -48,18 +48,18 @@ export default function RobotControl() {
   };
 
   return (
-  <div className='flex flex-row h-screen m-0 p-0 bg-fuchsia-200'>
-    <div className="flex flex-col justify-between bg-fuchsia-700 text-white w-40 p-4">
+  <div className='flex flex-row h-screen m-0 p-0 bg-purple-300'>
+    <div className="flex flex-col justify-between bg-purple-500 text-white w-40 p-4">
       <div>
         <img src={zuehlkeLogo.src} alt='Zühlke Logo' />
         <div className='flex flex-col gap-6 pt-6'>
-          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} />
-          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")}  />
-          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")}  />
+          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} className={activeTab == 'chat' ? 'selected' : ''} />
+          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")} className={activeTab == 'voice' ? 'selected' : ''} />
+          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")} className={activeTab == 'direct' ? 'selected' : ''} />
         </div>
       </div>
       { !!robotClient ? 
-        <div className='border p-3' onClick={() => setRobotClient(null)}>
+        <div className='border p-3 bg-purple-300 text-black' onClick={() => setRobotClient(null)}>
           <p>{ip}</p>
           { devices.map(device => {
             return (<p key={device}>{device}</p>)
