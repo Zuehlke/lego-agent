@@ -3,6 +3,8 @@ import {OpenAI} from 'openai';
 import RobotClient from './robot_client';
 import {model_chat, OPENAI_API_KEY} from './config';
 import {toolDescriptions, getToolDescChat} from './tools';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 interface ChatMessage {
   role: string;
@@ -32,6 +34,15 @@ export default function ChatControl({robotClient}: Props) {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const toolChatEndRef = useRef(null);
+  const chatEndRef = useRef(null);
+
+  
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    toolChatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [history]);
+  
 
   const callChatApi = async (currentHistory: ChatMessage[]): Promise<ChatMessage> => {
     const completion = await openai.chat.completions.create({
@@ -147,36 +158,25 @@ export default function ChatControl({robotClient}: Props) {
               content: `${toolCall.function.name} with arguments: ${toolCall.function.arguments}`,
             });
           });
-        }
-      });
-    return visualizedHistory;
-  }
-
-  function mapToolHistory(history: ChatMessage[]): ChatMessage[] {
-    const visualizedHistory: ChatMessage[] = [];
-    history
-      .filter((msg) => msg.role !== 'system')
-      .forEach((msg) => {
-        if (msg.role !== "assistant" && msg.role !== "user") {
+        } else if (msg.role !== "assistant" && msg.role !== "user") {
           visualizedHistory.push(msg);
         }
       });
     return visualizedHistory;
   }
 
-
-
   return (
     <div className='p-3 h-full'>
-      <div className='flex flex-row h-9/10'>
+      <div className='flex flex-row h-full'>
         <div className='p-3 w-1/2'>
-          <div className='flex flex-col p-4 rounded-2xl bg-purple-500 h-full'>
-            <div className='flex flex-col flex-grow border-2 p-3 mb-3 overflow-y-auto bg-purple-300'>
+          <div className='flex flex-col border-2 p-4 rounded-2xl bg-zuehlke-insight h-full shadow-2xl'>
+            <div className='flex flex-col flex-grow border-2 rounded-xl p-3 mb-3 overflow-y-auto bg-zuehlke-secondary'>
               {mapChatHistory(history).map((msg, idx) => (
                 <div key={idx} className='mb-1'>
                   <strong>{msg.role}:</strong> {msg.content}
                 </div>
               ))}
+              <div ref={chatEndRef} />
             </div>
 
             <div className='flex'>
@@ -188,31 +188,23 @@ export default function ChatControl({robotClient}: Props) {
                   if (e.key === 'Enter') handleSend();
                 }}
                 disabled={loading}
-                style={{flex: 1, padding: "8px", border: "1px solid black"}}
+                className='flex-1 p-2 border-2 rounded-xl bg-zuehlke-secondary'
               />
-              <button onClick={handleSend} disabled={loading} style={{marginLeft: "10px", padding: "8px"}}>
-                Send
+              <button onClick={handleSend} disabled={loading} className='hover:cursor-pointer px-3 '>
+                <FontAwesomeIcon icon={faPaperPlane} size='2x' />
               </button>
             </div>
           </div>
         </div>
-        <div className='flex flex-col w-1/2 p-3 gap-6'>
-          <div className='p-4 rounded-2xl bg-purple-500 flex-1'>
-            <div className='border-2 h-full p-3 overflow-y-auto bg-purple-300 flex-none'>
+        <div className='flex flex-col w-1/2 p-3'>
+          <div className='border-2 p-4 h-full rounded-2xl bg-zuehlke-insight shadow-2xl'>
+            <div className='border-2 h-full p-3 rounded-xl overflow-y-auto bg-zuehlke-secondary'>
               {mapToolCallHistory(history).map((msg, idx) => (
                 <div key={idx} >
                   <strong>{msg.role}:</strong> {msg.content}
                 </div>
               ))}
-            </div>
-          </div>
-          <div className='p-4 rounded-2xl bg-purple-500 flex-1'>
-            <div className='border-2 h-full p-3 overflow-y-auto bg-purple-300 flex-none'>
-              {mapToolHistory(history).map((msg, idx) => (
-                <div key={idx} className='mb-1'>
-                  <strong>{msg.role}:</strong> {msg.content}
-                </div>
-              ))}
+              <div ref={toolChatEndRef} />
             </div>
           </div>
         </div>

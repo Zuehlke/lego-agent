@@ -48,18 +48,18 @@ export default function RobotControl() {
   };
 
   return (
-  <div className='flex flex-row h-screen m-0 p-0 bg-purple-300'>
-    <div className="flex flex-col justify-between bg-purple-500 text-white w-40 p-4">
+  <div className='flex flex-row h-screen m-0 p-0 bg-zuehlke-secondary'>
+    <div className="flex flex-col justify-between bg-zuehlke-insight text-white w-40 p-4 pt-0">
       <div>
         <img src={zuehlkeLogo.src} alt='Zühlke Logo' />
         <div className='flex flex-col gap-6 pt-6'>
-          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} className={activeTab == 'chat' ? 'selected' : ''} />
-          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")} className={activeTab == 'voice' ? 'selected' : ''} />
-          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")} className={activeTab == 'direct' ? 'selected' : ''} />
+          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} className={(activeTab == 'chat' ? 'shadow bg-black' : '') + ' hover:cursor-pointer rounded-2xl'} />
+          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")} className={(activeTab == 'voice' ? 'shadow bg-black' : '') + ' hover:cursor-pointer rounded-2xl'} />
+          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")} className={(activeTab == 'direct' ? 'shadow bg-black' : '') + ' hover:cursor-pointer rounded-2xl'} />
         </div>
       </div>
       { !!robotClient ? 
-        <div className='border p-3 bg-purple-300 text-black' onClick={() => setRobotClient(null)}>
+        <div className='hover:cursor-pointer border p-3 bg-purple-300 text-black shadow rounded-2xl' onClick={() => setRobotClient(null)}>
           <p>{ip}</p>
           { devices.map(device => {
             return (<p key={device}>{device}</p>)
@@ -71,7 +71,6 @@ export default function RobotControl() {
     </div>
 
     <div className='flex flex-col w-full'>
-      <h1 className='p-3'>Lego Agent</h1>
       <div className='items-center h-full'>
         { !!!robotClient ?
           <div className='mx-auto flex flex-col max-w-sm items-center gap-x-4 gap-y-3 rounded-xl p-5 shadow-lg outline dark:bg-fuchsia-700 dark:shadow-2xl'>

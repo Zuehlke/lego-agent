@@ -17,6 +17,11 @@ export default function VoiceControl({robotClient}: Props) {
   const audioElement = useRef<HTMLAudioElement>(null);
   const [listening, setListening] = useState(true);
   const [functionCalls, setFunctionCalls] = useState<{name: string, args: string, result: string}[]>([]);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [functionCalls]);
 
   async function startSession() {
     setStatus("connecting");
@@ -136,11 +141,12 @@ export default function VoiceControl({robotClient}: Props) {
                   output: String(toolResult)
                 }
               });
-              setFunctionCalls((prev) => [{
+              setFunctionCalls((prev) => [...prev,
+                {
                 name: output.name,
                 args: output.arguments,
                 result: String(toolResult)
-              }, ...prev])
+              }])
             }
           }))
           if(function_called) {
@@ -152,9 +158,9 @@ export default function VoiceControl({robotClient}: Props) {
   }, [dataChannel]);
 
   return (
-    <div className='flex flex-row h-full w-full'>
-      <div className='flex flex-col flex-1 p-3 justify-center gap-10'>
-        <button disabled={status === "connecting"} onClick={status === "connected" ? stopSession : startSession}>
+    <div className='flex flex-row h-full w-full p-3'>
+      <div className='flex flex-col flex-1 p-3 justify-center gap-20'>
+        <button disabled={status === "connecting"} onClick={status === "connected" ? stopSession : startSession} className='hover:cursor-pointer'>
           <FontAwesomeIcon size='10x' icon={status === "connected" ? faMicrophone : faMicrophoneSlash} />
         </button>
         <FontAwesomeIcon size='10x' icon={ status === "disconnected" ? (
@@ -170,11 +176,12 @@ export default function VoiceControl({robotClient}: Props) {
         
       </div>
       <div className='flex-1 p-3'>
-        <div className='p-4 rounded-2xl bg-purple-500 flex-1 h-full'>
-          <div className='border-2 h-full p-3 overflow-y-auto bg-purple-300 flex-none'>
+        <div className='border-2 p-4 rounded-2xl bg-zuehlke-insight flex-1 h-full shadow-2xl'>
+          <div className='border-2 h-full rounded-xl p-3 overflow-y-auto bg-zuehlke-secondary flex-none'>
             {functionCalls.map((call, i) => (
               <div key={i}><b>{call.name}</b> {call.args}: {call.result}</div>
             ))}
+            <div ref={chatEndRef} />
           </div>
         </div>
       </div>     
