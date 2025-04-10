@@ -7,6 +7,9 @@ body {
 .shadow {
   box-shadow: 0 0 10px #000, 0 0 20px #000, 0 0 30px #000;
 }
+.shadow-white {
+  box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff, 0 0 90px #ffffff;
+}
 
 .bg-zuehlke-insight {
   background-color: #925ea9;
