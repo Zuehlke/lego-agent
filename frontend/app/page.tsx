@@ -73,20 +73,22 @@ export default function RobotControl() {
     <div className='flex flex-col w-full'>
       <div className='items-center h-full'>
         { !!!robotClient ?
-          <div className='mx-auto flex flex-col max-w-sm items-center gap-x-4 gap-y-3 rounded-xl p-5 shadow-lg outline dark:bg-fuchsia-700 dark:shadow-2xl'>
-            <input
-              className='bg-white'
-              type="text"
-              value={ip}
-              style={{border: "1px solid black"}}
-              onChange={(e) => setIp(e.target.value)}
-              onKeyUp={(e) => {
-                if (e.key === 'Enter') handleConfirm();
-              }}
-              placeholder="Enter robot IP"
-            />
-            <p>Status: {status}</p>
-            <button className="bg-sky-500 hover:bg-sky-700 rounded-2xl p-1" onClick={handleConfirm}>Confirm</button>
+          <div className='h-full flex  items-center'>
+            <div className='mx-auto flex flex-col max-w-sm items-center gap-x-4 gap-y-3 rounded-xl p-5 shadow-lg outline bg-zuehlke-insight dark:shadow-2xl'>
+              <input
+                className='bg-white'
+                type="text"
+                value={ip}
+                style={{border: "1px solid black"}}
+                onChange={(e) => setIp(e.target.value)}
+                onKeyUp={(e) => {
+                  if (e.key === 'Enter') handleConfirm();
+                }}
+                placeholder="Enter robot IP"
+              />
+              <p>Status: {status}</p>
+              <button className="bg-sky-500 hover:bg-sky-700 rounded-2xl p-1" onClick={handleConfirm}>Confirm</button>
+            </div>
           </div>
           :
           <div className='h-full'>
