@@ -169,8 +169,8 @@ export default function ChatControl({robotClient}: Props) {
     <div className='p-3 h-full'>
       <div className='flex flex-row h-full'>
         <div className='p-3 w-1/2'>
-          <div className='flex flex-col border-2 p-4 rounded-2xl bg-zuehlke-insight h-full shadow-2xl'>
-            <div className='flex flex-col flex-grow border-2 rounded-xl p-3 mb-3 overflow-y-auto bg-zuehlke-secondary'>
+          <div className='flex flex-col border border-zuehlke p-4 rounded-2xl bg-zuehlke-insight h-full shadow-2xl'>
+            <div className='flex flex-col flex-grow border border-zuehlke rounded-xl p-3 mb-3 overflow-y-auto bg-zuehlke-secondary'>
               {mapChatHistory(history).map((msg, idx) => (
                 <div key={idx} className='mb-1'>
                   <strong>{msg.role}:</strong> {msg.content}
@@ -188,7 +188,7 @@ export default function ChatControl({robotClient}: Props) {
                   if (e.key === 'Enter') handleSend();
                 }}
                 disabled={loading}
-                className='flex-1 p-2 border-2 rounded-xl bg-zuehlke-secondary'
+                className='flex-1 p-2 border border-zuehlke rounded-xl bg-zuehlke-secondary'
               />
               <button onClick={handleSend} disabled={loading} className='hover:cursor-pointer px-3 '>
                 <FontAwesomeIcon icon={faPaperPlane} size='2x' />
@@ -197,8 +197,8 @@ export default function ChatControl({robotClient}: Props) {
           </div>
         </div>
         <div className='flex flex-col w-1/2 p-3'>
-          <div className='border-2 p-4 h-full rounded-2xl bg-zuehlke-insight shadow-2xl'>
-            <div className='border-2 h-full p-3 rounded-xl overflow-y-auto bg-zuehlke-secondary'>
+          <div className='border border-zuehlke p-4 h-full rounded-2xl bg-zuehlke-insight shadow-2xl'>
+            <div className='border border-zuehlke h-full p-3 rounded-xl overflow-y-auto bg-zuehlke-secondary'>
               {mapToolCallHistory(history).map((msg, idx) => (
                 <div key={idx} >
                   <strong>{msg.role}:</strong> {msg.content}

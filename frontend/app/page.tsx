@@ -48,8 +48,8 @@ export default function RobotControl() {
   };
 
   return (
-  <div className='flex flex-row h-screen m-0 p-0 bg-zuehlke-secondary'>
-    <div className="flex flex-col justify-between bg-zuehlke-insight text-white w-40 p-4 pt-0">
+  <div className='flex flex-row h-screen m-0 p-0 bg-zuehlke-secondary '>
+    <div className="flex flex-col justify-between bg-zuehlke-insight text-white w-40 p-4 pt-0 border-r border-zuehlke">
       <div>
         <img src={zuehlkeLogo.src} alt='Zühlke Logo' />
         <div className='flex flex-col gap-6 pt-6'>
@@ -59,7 +59,7 @@ export default function RobotControl() {
         </div>
       </div>
       { !!robotClient ? 
-        <div className='hover:cursor-pointer border p-3 bg-purple-300 text-black shadow rounded-2xl' onClick={() => setRobotClient(null)}>
+        <div className='hover:cursor-pointer border p-3 bg-zuehlke-secondary text-black shadow rounded-2xl' onClick={() => setRobotClient(null)}>
           <p>{ip}</p>
           { devices.map(device => {
             return (<p key={device}>{device}</p>)
@@ -67,7 +67,6 @@ export default function RobotControl() {
         </div>
         : null
       }
-      
     </div>
 
     <div className='flex flex-col w-full'>

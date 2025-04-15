@@ -179,8 +179,8 @@ export default function VoiceControl({robotClient}: Props) {
         
       </div>
       <div className='flex-1 p-3'>
-        <div className='border-2 p-4 rounded-2xl bg-zuehlke-insight flex-1 h-full shadow-2xl'>
-          <div className='border-2 h-full rounded-xl p-3 overflow-y-auto bg-zuehlke-secondary flex-none'>
+        <div className='border border-zuehlke p-4 rounded-2xl bg-zuehlke-insight flex-1 h-full shadow-2xl'>
+          <div className='border border-zuehlke h-full rounded-xl p-3 overflow-y-auto bg-zuehlke-secondary flex-none'>
             {functionCalls.map((call, i) => (
               <div key={i}><b>{call.name}</b> {call.args}: {call.result}</div>
             ))}

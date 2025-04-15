@@ -12,7 +12,7 @@ body {
 }
 
 .bg-zuehlke-insight {
-  background-color: #925ea9;
+  background-color: #925fa7;
 }
 
 .bg-zuehlke-website {
@@ -20,5 +20,9 @@ body {
 }
 
 .bg-zuehlke-secondary {
-  background-color: #d2b2e0;
+  background-color: #e6dfe9;
+}
+
+.border-zuehlke {
+  border-color: var(--color-gray-500);
 }
