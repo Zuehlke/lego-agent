@@ -33,6 +33,12 @@ export default function RobotControl() {
     }
   };
 
+  const handleLogout = async () => {
+    setStatus('Disconnected');
+    setRobotClient(null)
+    setDevices([]);
+  };
+
   const renderActiveTab = () => {
     if (!robotClient) return null;
     switch (activeTab) {
@@ -59,7 +65,7 @@ export default function RobotControl() {
         </div>
       </div>
       { !!robotClient ? 
-        <div className='hover:cursor-pointer border p-3 bg-zuehlke-secondary text-black shadow rounded-2xl' onClick={() => setRobotClient(null)}>
+        <div className='hover:cursor-pointer border p-3 bg-zuehlke-secondary text-black shadow rounded-2xl' onClick={() => handleLogout()}>
           <p>{ip}</p>
           { devices.map(device => {
             return (<p key={device}>{device}</p>)
@@ -72,21 +78,20 @@ export default function RobotControl() {
     <div className='flex flex-col w-full'>
       <div className='items-center h-full'>
         { !!!robotClient ?
-          <div className='h-full flex  items-center'>
-            <div className='mx-auto flex flex-col max-w-sm items-center gap-x-4 gap-y-3 rounded-xl p-5 shadow-lg outline bg-zuehlke-insight dark:shadow-2xl'>
+          <div className='h-full flex items-center'>
+            <div className='mx-auto flex flex-col max-w-sm items-center gap-x-4 gap-y-3 rounded-xl p-5 shadow-lg border border-zuehlke bg-zuehlke-insight dark:shadow-2xl'>
+              <p className='text-white'>{status}</p>
               <input
-                className='bg-white'
+                className='bg-white border border-zuehlke rounded-sm p-1'
                 type="text"
                 value={ip}
-                style={{border: "1px solid black"}}
                 onChange={(e) => setIp(e.target.value)}
                 onKeyUp={(e) => {
                   if (e.key === 'Enter') handleConfirm();
                 }}
                 placeholder="Enter robot IP"
               />
-              <p>Status: {status}</p>
-              <button className="bg-sky-500 hover:bg-sky-700 rounded-2xl p-1" onClick={handleConfirm}>Confirm</button>
+              <button className=" text-white bg-sky-600 hover:bg-sky-700 hover:cursor-pointer rounded-2xl p-1 px-2 border border-zuehlke" onClick={handleConfirm}>Confirm</button>
             </div>
           </div>
           :
