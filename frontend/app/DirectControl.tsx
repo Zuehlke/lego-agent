@@ -8,6 +8,7 @@ interface Props {
 export default function DirectControl({ robotClient }: Props) {
   const [leftSpeed, setLeftSpeed] = useState(0);
   const [rightSpeed, setRightSpeed] = useState(0);
+  const [position, setPosition] = useState(0);
   const [leftColor, setLeftColor] = useState('');
   const [rightColor, setRightColor] = useState('');
   const [speakText, setSpeakText] = useState('');
@@ -15,6 +16,10 @@ export default function DirectControl({ robotClient }: Props) {
 
   const handleSetMotors = async () => {
     await robotClient.setMotors(leftSpeed, rightSpeed);
+  };
+
+  const handleSetHead = async () => {
+    await robotClient.setHead(position);
   };
 
   const handleSetLights = async () => {
@@ -48,6 +53,16 @@ export default function DirectControl({ robotClient }: Props) {
           placeholder="Right Speed"
         />
         <button onClick={handleSetMotors}>Set Motors</button>
+      </div>
+      <div>
+        <h3>Set Head</h3>
+        <input
+          type="number"
+          value={position}
+          onChange={(e) => setPosition(Number(e.target.value))}
+          placeholder="Position"
+        />
+        <button onClick={handleSetHead}>Set Head</button>
       </div>
       <div>
         <h3>Set Lights</h3>

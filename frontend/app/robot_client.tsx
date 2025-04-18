@@ -41,6 +41,15 @@ export default class RobotClient {
     await this.handleResponse(response);
   }
 
+  async setHead(position: number): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/set_head`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({position})
+    });
+    await this.handleResponse(response);
+  }
+
   async speak(text: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/speak`, {
       method: 'POST',
