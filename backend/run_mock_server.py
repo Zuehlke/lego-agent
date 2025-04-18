@@ -26,6 +26,11 @@ def set_motors():
     print(f'Called set_motors with {request.json}')
     return jsonify({'status': 'success'})
 
+@app.route('/set_head', methods=['POST'])
+def set_head():
+    print(f'Called set_head with {request.json}')
+    return jsonify({'status': 'success'})
+
 @app.route('/speak', methods=['POST'])
 def speak():
     print(f'Called speak with {request.json}')

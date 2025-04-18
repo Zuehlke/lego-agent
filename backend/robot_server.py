@@ -5,7 +5,7 @@ from typing import List
 
 from ev3dev2 import DeviceNotFound
 from ev3dev2.led import Leds
-from ev3dev2.motor import MoveTank, OUTPUT_A, OUTPUT_D, SpeedPercent
+from ev3dev2.motor import MoveTank, Motor, OUTPUT_A, OUTPUT_B, OUTPUT_C, SpeedPercent
 from ev3dev2.sound import Sound
 from ev3dev2.sensor import INPUT_1, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor, ColorSensor, InfraredSensor
@@ -14,6 +14,7 @@ from ev3dev2.sensor.lego import TouchSensor, ColorSensor, InfraredSensor
 class Device(Enum):
     LIGHTS = 'Lights'
     MOTORS = 'Motors'
+    HEAD = 'Head'
     SPEAKER = 'Speaker'
     DISTANCE = 'Distance'
 
@@ -40,7 +41,8 @@ class RobotServer:
         # Make sure these ports are in sync with the information in the README.
         self._devices = []
         self._leds = self._try_init_device(lambda: Leds(), Device.LIGHTS)
-        self._tank_drive = self._try_init_device(lambda: MoveTank(OUTPUT_A, OUTPUT_D), Device.MOTORS)
+        self._tank_drive = self._try_init_device(lambda: MoveTank(OUTPUT_C, OUTPUT_B), Device.MOTORS)
+        self._head = self._try_init_device(lambda: Motor(OUTPUT_A), Device.HEAD)
         self._sound = self._try_init_device(lambda: Sound(), Device.SPEAKER)
         self._ultrasonic_sensor = self._try_init_device(lambda: InfraredSensor(INPUT_4), Device.DISTANCE)
 
@@ -64,6 +66,11 @@ class RobotServer:
         self._watchdog_cnt = 0
         self._watchdog_enabled = True
         self._tank_drive.on(SpeedPercent(-left_speed), SpeedPercent(-right_speed))  # invert due to caterpillar tracks
+
+    def set_heads(self, position: int) -> None:
+        if self._head is None:
+            raise IOError('Head not connected')
+        self._head.on_to_position(20, position)
 
     def speak(self, text: str) -> None:
         if self._sound is None:
