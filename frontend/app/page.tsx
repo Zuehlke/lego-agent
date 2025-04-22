@@ -55,18 +55,18 @@ export default function RobotControl() {
 
   return (
   <div className='flex flex-row h-screen m-0 p-0 bg-zuehlke-secondary '>
-    <div className="flex flex-col justify-between bg-zuehlke-insight text-white w-40 p-4 pt-0 border-r border-zuehlke">
+    <div className="flex flex-col justify-between bg-zuehlke-insight text-white w-50 p-4 pt-0 border-r border-zuehlke">
       <div>
         <img src={zuehlkeLogo.src} alt='Zühlke Logo' />
         <div className='flex flex-col gap-6 pt-6'>
-          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} className={(activeTab == 'chat' ? 'shadow bg-black' : '') + ' hover:cursor-pointer rounded-2xl'} />
-          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")} className={(activeTab == 'voice' ? 'shadow bg-black' : '') + ' hover:cursor-pointer rounded-2xl'} />
-          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")} className={(activeTab == 'direct' ? 'shadow bg-black' : '') + ' hover:cursor-pointer rounded-2xl'} />
+          <FontAwesomeIcon icon={faKeyboard} size='3x' onClick={(e) => setActiveTab("chat")} className={(activeTab == 'chat' ? 'shadow bg-neutral-900' : '') + ' hover:cursor-pointer rounded-2xl'} />
+          <FontAwesomeIcon icon={faHeadset} size='3x' onClick={(e) => setActiveTab("voice")} className={(activeTab == 'voice' ? 'shadow bg-neutral-900' : '') + ' hover:cursor-pointer rounded-2xl'} />
+          <FontAwesomeIcon icon={faCode} size='3x' onClick={(e) => setActiveTab("direct")} className={(activeTab == 'direct' ? 'shadow bg-neutral-900' : '') + ' hover:cursor-pointer rounded-2xl'} />
         </div>
       </div>
       { !!robotClient ? 
         <div className='hover:cursor-pointer border p-3 bg-zuehlke-secondary text-black shadow rounded-2xl' onClick={() => handleLogout()}>
-          <p>{ip}</p>
+          <p className='font-bold'>{ip}</p>
           { devices.map(device => {
             return (<p key={device}>{device}</p>)
           }) }
