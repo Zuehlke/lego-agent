@@ -22,6 +22,22 @@ Content-Type: application/json
 }
 
 ###
+POST {{baseUrl}}/set_head
+Content-Type: application/json
+
+{
+  "position": 100
+}
+
+###
+POST {{baseUrl}}/set_head
+Content-Type: application/json
+
+{
+  "position": 0
+}
+
+###
 POST {{baseUrl}}/speak
 Content-Type: application/json
 

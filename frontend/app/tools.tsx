@@ -41,6 +41,18 @@ export const toolDescriptions: {
       required: ["leftSpeed", "rightSpeed"],
     }
   },
+  setHead: {
+    description: "Set the position of the head.",
+    parameters: {
+      properties: {
+        position: {
+          type: "number",
+          description: "Position, from -100 (fully to the right) to 100 (fully to the left)."
+        }
+      },
+      required: ["position"],
+    }
+  },
   speak: {
     description: "Speak a text via the speaker of the robot.",
     parameters: {

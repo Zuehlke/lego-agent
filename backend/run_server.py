@@ -50,6 +50,16 @@ def set_motors():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/set_head', methods=['POST'])
+def set_head():
+    try:
+        data = request.json
+        position = data.get('position')
+        robot.set_heads(position)
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/speak', methods=['POST'])
 def speak():
     try:
