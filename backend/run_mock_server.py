@@ -14,7 +14,7 @@ cors = CORS(app)
 @app.route('/list_devices', methods=['GET'])
 def list_devices():
     print('Called list_devices')
-    return jsonify(['Lights', 'Motors', 'Speaker', 'Distance'])
+    return jsonify(['Lights', 'Motors', 'Head', 'Speaker', 'Distance'])
 
 @app.route('/set_lights', methods=['POST'])
 def set_lights():
