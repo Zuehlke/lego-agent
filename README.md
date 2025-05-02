@@ -10,12 +10,6 @@ Furthermore, copy _frontend/app/config.template.tsx_ to _frontend/app/config.tsx
 
 ## Prepare Robot
 
-Connect the following hardware to the EV3 block:
-
-- Left motor to port A
-- Right motor to port D
-- Ultrasonic sensor to port 4
-
 Connect the robot to the same Wi-Fi as your laptop. The robot only supports 2.4 GHz networks.
 Upon successful connection, the IP is shown on the top left. Make sure you write it down, since you need it later.
 
@@ -62,5 +56,11 @@ If you cannot connect to the robot, check the following:
 - Is the server on the robot running (_run_server.py_)?
 - Was the IP of the robot correctly entered?
 
-If you can connect, but a specific sensor or actor is not working, check if it's connected at the right location.
-Optionally plug it out and in again or replace the cable.
+If you can connect, but a specific sensor or actor is not working, check if it's connected at the right location:
+
+- Left motor on Port C
+- Right motor on Port B
+- Head motor on Port A
+- Distance sensor on Port 4
+
+You can also try plugging a sensor/actor out and in again or replacing the cable.
