@@ -64,3 +64,15 @@ If you can connect, but a specific sensor or actor is not working, check if it's
 - Distance sensor on Port 4
 
 You can also try plugging a sensor/actor out and in again or replacing the cable.
+
+## MCP Server
+
+The robot can also be exposed as MCP server. For this, navigate to the _mcp_server_ repo and run the following:
+
+```
+uv sync
+source .venv/bin/activate
+uvicorn server:app --reload --host 0.0.0.0 --port 8000
+```
+
+The MCP server is now running at http://localhost:8000/mcp via streamable HTTP.
