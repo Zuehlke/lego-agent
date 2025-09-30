@@ -67,7 +67,7 @@ You can also try plugging a sensor/actor out and in again or replacing the cable
 
 ## MCP Server
 
-The robot can also be exposed as MCP server. For this, navigate to the _mcp_server_ repo and run the following:
+The robot can also be exposed as MCP server. For this, navigate to the _mcp_server_ directory and run the following:
 
 ```
 uv sync
