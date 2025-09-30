@@ -72,7 +72,8 @@ The robot can also be exposed as MCP server. For this, navigate to the _mcp_serv
 ```
 uv sync
 source .venv/bin/activate
-uvicorn server:app --reload --host 0.0.0.0 --port 8000
+export ROBOT_IP="<robot-ip>"
+uvicorn server:app --host 0.0.0.0 --port 8000
 ```
 
 The MCP server is now running at http://localhost:8000/mcp via streamable HTTP.
