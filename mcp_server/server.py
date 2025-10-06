@@ -2,8 +2,13 @@ from mcp.server.fastmcp import FastMCP
 from robot_client import RobotClient
 from typing import Literal
 import os
+import httpx
+from starlette.responses import JSONResponse
+from starlette.routing import Route
+from starlette.exceptions import HTTPException
 
 ROBOT_IP = os.environ["ROBOT_IP"]
+OAUTH_AUTHORIZATION_SERVER_URL = os.environ.get("OAUTH_AUTHORIZATION_SERVER_URL")
 
 mcp = FastMCP("Lego Robot")
 robot = RobotClient(ROBOT_IP)
@@ -70,3 +75,20 @@ def getDevices() -> list[str]:
     return devices
 
 app = mcp.streamable_http_app()
+
+async def oauth_authorization_server(request):
+    if not OAUTH_AUTHORIZATION_SERVER_URL:
+        raise HTTPException(status_code=404, detail="OAuth authorization server URL not configured")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{OAUTH_AUTHORIZATION_SERVER_URL}/.well-known/oauth-authorization-server")
+            response.raise_for_status()
+            return JSONResponse(response.json())
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch OAuth configuration: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+oauth_route = Route("/.well-known/oauth-authorization-server", oauth_authorization_server, methods=["GET"])
+app.router.routes.append(oauth_route)
