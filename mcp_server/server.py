@@ -76,13 +76,14 @@ def getDevices() -> list[str]:
 
 app = mcp.streamable_http_app()
 
-async def oauth_authorization_server(request):
+async def well_known_handler(request):
     if not OAUTH_AUTHORIZATION_SERVER_URL:
         raise HTTPException(status_code=404, detail="OAuth authorization server URL not configured")
     
+    path = request.url.path
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{OAUTH_AUTHORIZATION_SERVER_URL}/.well-known/oauth-authorization-server")
+            response = await client.get(f"{OAUTH_AUTHORIZATION_SERVER_URL}{path}")
             response.raise_for_status()
             return JSONResponse(response.json())
     except httpx.HTTPError as e:
@@ -90,5 +91,7 @@ async def oauth_authorization_server(request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-oauth_route = Route("/.well-known/oauth-authorization-server", oauth_authorization_server, methods=["GET"])
-app.router.routes.append(oauth_route)
+oauth_authorization_route = Route("/.well-known/oauth-authorization-server", well_known_handler, methods=["GET"])
+openid_configuration_route = Route("/.well-known/openid-configuration", well_known_handler, methods=["GET"])
+app.router.routes.append(oauth_authorization_route)
+app.router.routes.append(openid_configuration_route)
